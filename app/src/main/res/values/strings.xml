@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">TicTacToeApp</string>
+    <string name="app_name">Tic Tac Toe</string>
+    <string name="mode_2_players">2 PLAYERS</string>
+    <string name="mode_vs_bot">VS BOT</string>
+    <string name="player_x_label">PLAYER X</string>
+    <string name="player_o_label">PLAYER O</string>
+    <string name="bot_label">BOT (O)</string>
+    <string name="restart_game">RESTART GAME</string>
+    <string name="player_x_wins">Player X Wins!</string>
+    <string name="player_o_wins">Player O Wins!</string>
+    <string name="bot_wins">Bot Wins!</string>
+    <string name="game_draw">It\'s a Draw!</string>
 </resources>

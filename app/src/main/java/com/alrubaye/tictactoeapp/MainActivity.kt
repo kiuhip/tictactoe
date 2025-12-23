@@ -2,7 +2,6 @@ package com.alrubaye.tictactoeapp
 
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +23,15 @@ class MainActivity : AppCompatActivity() {
     // Scores
     private var player1Score = 0
     private var player2Score = 0
+
+    // Lazy initialization for buttons
+    private val boardButtons by lazy {
+        listOf(
+            binding.btn1, binding.btn2, binding.btn3,
+            binding.btn4, binding.btn5, binding.btn6,
+            binding.btn7, binding.btn8, binding.btn9
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,13 +61,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Grid Buttons
-        val buttons = listOf(
-            binding.btn1, binding.btn2, binding.btn3,
-            binding.btn4, binding.btn5, binding.btn6,
-            binding.btn7, binding.btn8, binding.btn9
-        )
-
-        for ((index, button) in buttons.withIndex()) {
+        for ((index, button) in boardButtons.withIndex()) {
             val cellId = index + 1
             button.setOnClickListener {
                 if (gameActive) {
@@ -71,13 +73,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateModeUI() {
         if (isVsBot) {
-            binding.tvPlayer2Label.text = "BOT (O)"
+            binding.tvPlayer2Label.text = getString(R.string.bot_label)
             binding.btnVsBot.setBackgroundResource(R.drawable.bg_button_rounded)
             binding.btnVsBot.background.setTint(ContextCompat.getColor(this, R.color.purple_500))
             binding.btn2Players.setBackgroundResource(R.drawable.bg_button_rounded)
             binding.btn2Players.background.setTintList(null) // clear tint
         } else {
-            binding.tvPlayer2Label.text = "PLAYER O"
+            binding.tvPlayer2Label.text = getString(R.string.player_o_label)
             binding.btn2Players.setBackgroundResource(R.drawable.bg_button_rounded)
             binding.btn2Players.background.setTint(ContextCompat.getColor(this, R.color.purple_500))
             binding.btnVsBot.setBackgroundResource(R.drawable.bg_button_rounded)
@@ -99,7 +101,6 @@ class MainActivity : AppCompatActivity() {
         // Highlight active player
         if (activePlayer == 1) {
              binding.player1Layout.setBackgroundResource(R.drawable.bg_button_rounded)
-             // Transparent for inactive
              binding.player2Layout.background = null
         } else {
              binding.player2Layout.setBackgroundResource(R.drawable.bg_button_rounded)
@@ -160,11 +161,11 @@ class MainActivity : AppCompatActivity() {
             gameActive = false
             if (winner == 1) {
                 player1Score++
-                Toast.makeText(this, "Player X Wins!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.player_x_wins), Toast.LENGTH_SHORT).show()
             } else {
                 player2Score++
-                val winnerName = if (isVsBot) "Bot" else "Player O"
-                Toast.makeText(this, "$winnerName Wins!", Toast.LENGTH_SHORT).show()
+                val msg = if (isVsBot) getString(R.string.bot_wins) else getString(R.string.player_o_wins)
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             }
             updateScoreBoard()
             return true
@@ -173,7 +174,7 @@ class MainActivity : AppCompatActivity() {
         // Draw Check
         if (player1Moves.size + player2Moves.size == 9) {
              gameActive = false
-             Toast.makeText(this, "It's a Draw!", Toast.LENGTH_SHORT).show()
+             Toast.makeText(this, getString(R.string.game_draw), Toast.LENGTH_SHORT).show()
              return true
         }
 
@@ -181,33 +182,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun autoPlay() {
-        val emptyCells = ArrayList<Int>()
-        for (cellId in 1..9) {
-            if (!player1Moves.contains(cellId) && !player2Moves.contains(cellId)) {
-                emptyCells.add(cellId)
-            }
-        }
+        val emptyCells = (1..9).filter { !player1Moves.contains(it) && !player2Moves.contains(it) }
 
         if (emptyCells.isEmpty()) return
 
         // Simple AI: Random move
-        // Possible improvement: Minimax algorithm or strategic blocking
-        val r = Random
-        val randIndex = r.nextInt(emptyCells.size)
-        val cellId = emptyCells[randIndex]
-
-        val buSelected: Button = when (cellId) {
-            1 -> binding.btn1
-            2 -> binding.btn2
-            3 -> binding.btn3
-            4 -> binding.btn4
-            5 -> binding.btn5
-            6 -> binding.btn6
-            7 -> binding.btn7
-            8 -> binding.btn8
-            9 -> binding.btn9
-            else -> binding.btn1
-        }
+        val cellId = emptyCells.random()
+        val buSelected = boardButtons[cellId - 1]
 
         playGame(cellId, buSelected)
     }
@@ -218,13 +199,7 @@ class MainActivity : AppCompatActivity() {
         player2Moves.clear()
         gameActive = true
 
-        val buttons = listOf(
-            binding.btn1, binding.btn2, binding.btn3,
-            binding.btn4, binding.btn5, binding.btn6,
-            binding.btn7, binding.btn8, binding.btn9
-        )
-
-        for (bu in buttons) {
+        for (bu in boardButtons) {
             bu.text = ""
             bu.isEnabled = true
         }
